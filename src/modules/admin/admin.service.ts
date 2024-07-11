@@ -1,19 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { AdminDocument } from './admin.schema';
+import { Models, AdminDocument } from 'src/schemas';
 
 @Injectable()
 export class AdminService {
   constructor(
-    @InjectModel('Admin') private readonly adminModel: Model<AdminDocument>,
+    @InjectModel(Models.Admin.name)
+    private readonly admin: Model<AdminDocument>,
   ) {}
 
-  async getAdminUser() {
-    return this.adminModel.findOne({});
+  /**
+   * Signup
+   * @param body
+   * @returns
+   */
+  async signup(body) {
+    const data = await this.admin.create(body);
+    return data;
   }
 
-  async createAdmin(dataToSave) {
-    return await this.adminModel.create(dataToSave);
+  /**
+   * Signin
+   * @returns
+   */
+  async signIn() {
+    return { login: true };
   }
 }

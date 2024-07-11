@@ -18,13 +18,9 @@ export class User {
   @Prop({ required: true, unique: true })
   email: string;
 
-  @Prop({ required: false })
-  clientId?: string;
-
   @Prop({ required: true })
   password: string;
 }
 
-export type AdminDocument = User & Document;
-
-export const AdminSchema = SchemaFactory.createForClass(User);
+export type UserDocument = User & Document;
+export const UserSchema = SchemaFactory.createForClass(User);

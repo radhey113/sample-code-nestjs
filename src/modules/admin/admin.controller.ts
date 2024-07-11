@@ -2,39 +2,33 @@ import {
   Body,
   Controller,
   Get,
-  HttpStatus,
-  Post,
-  Req,
   Res,
   UsePipes,
   ValidationPipe,
-  HttpException,
+  Post,
 } from '@nestjs/common';
 import { AdminService } from './admin.service';
-import { AdminDocument } from './admin.schema';
-import { getReadableErrorMessage } from '../../services/utils';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { SignupDTO, SwaggerSchema } from 'src/modules/admin/common';
+import { exceptionFactory } from 'src/utils';
 
 @Controller('admin')
+@ApiTags(`Admin Auth API's`)
 export class AdminController {
   constructor(private readonly adminservice: AdminService) {}
 
-  @Get('/get-admin')
-  async getAdmin(@Req() req, @Res() res): Promise<any> {
-    const data = this.adminservice.getAdminUser();
-    return res.json(data);
+  @Get('/')
+  async getAdmin(@Res() res): Promise<any> {
+    return res.json({ status: true });
   }
 
-  @Post('/create-admin')
-  @UsePipes(
-    new ValidationPipe({
-      exceptionFactory: (error: any) => {
-        const err = getReadableErrorMessage(error[0].constraints);
-        return new HttpException(err, HttpStatus.BAD_REQUEST);
-      },
-    }),
-  )
-  async createAdmin(@Body() body, @Res() res): Promise<AdminDocument> {
-    const data = await this.adminservice.createAdmin(body);
-    return res.status(HttpStatus.CREATED).json(data);
+  @Post('/signup')
+  @ApiOperation({ summary: 'Admin signup' })
+  @ApiBody({ ...SwaggerSchema.SIGNUP })
+  @ApiResponse({ status: 201, description: 'Success...' })
+  @UsePipes(new ValidationPipe({ exceptionFactory }))
+  async signup(@Body() body: SignupDTO, @Res() res): Promise<any> {
+    const data = await this.adminservice.signup(body);
+    return res.json({ data });
   }
 }
